@@ -6,8 +6,8 @@
       <mdb-navbar-toggler>
         <mdb-navbar-nav>
           <mdb-nav-item waves-fixed><router-link to="/">Home</router-link></mdb-nav-item>
+          <mdb-nav-item waves-fixed><router-link to="/calendar">Calendar</router-link></mdb-nav-item>
           <mdb-nav-item waves-fixed><router-link to="/about">About</router-link></mdb-nav-item>
-          <mdb-nav-item waves-fixed>Pricing</mdb-nav-item>
           <!-- Dropdown -->
           <mdb-dropdown tag="li" class="nav-item">
             <mdb-dropdown-toggle tag="a" navLink color="primary" slot="toggle" waves-fixed>Dropdown</mdb-dropdown-toggle>
