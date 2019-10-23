@@ -15,13 +15,6 @@ Settings.defaultLocale = 'bg'
 Vue.use(Datetime)
 Vue.config.productionTip = false
 
-import * as _ from 'lodash'
-window._ = _
-import conf from './core/conf'
-window.conf = conf
-window.apis = conf.server.apis
-window.api = conf.api
-
 new Vue({
   router,
   store,

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import * as _ from 'lodash'
 
 class Api {
 
@@ -23,7 +24,7 @@ class Api {
     var self = this
     
     headers = self.setHeaders(data, headers)
-      // headers.Authorization = `Basic ${btoa(process.env.VUE_APP_APIKEY)}`;
+    //headers.Authorization = `Basic ${btoa(process.env.VUE_APP_APIKEY)}`;
 
       var promise = new Promise((resolve, reject) => { 
         axios({
@@ -67,16 +68,8 @@ class Api {
     return this.send('DELETE', url, {}, headers, options);
   }
 
-  upload(url, file, headers) {
-    
-  }
-
-  download(url) {
-    
-  }
-
   handleErrors(err) {
-    
+    console.error(err);
   }
 }
 

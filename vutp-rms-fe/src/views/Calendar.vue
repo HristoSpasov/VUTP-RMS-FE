@@ -19,11 +19,11 @@
           <div>
             <datetime 
               class="theme-orange"
-              type="datetime"
+              type="time"
               v-model="startDatetime"
               input-class="date-time"
-              value-zone="America/New_York"
-              zone="Asia/Shanghai"
+              value-zone="UTC"
+              zone="local"
               :format="{ year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }"
               :phrases="{ok: 'Continue', cancel: 'Exit'}"
               :hour-step="1"
@@ -37,11 +37,10 @@
           <div>
             <datetime 
               class="theme-orange"
-              type="datetime"
+              type="time"
               v-model="endDatetime"
               input-class="date-time"
-              value-zone="America/New_York"
-              zone="Asia/Shanghai"
+              zone="local"
               :format="{ year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }"
               :phrases="{ok: 'Continue', cancel: 'Exit'}"
               :hour-step="1"
@@ -72,22 +71,28 @@ import interactionPlugin from '@fullcalendar/interaction';
 
 import { mdbContainer, mdbBtn, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody, mdbModalFooter } from "mdbvue";
 
+import { mapActions } from 'vuex'
 
 export default {
   components: { FullCalendar, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody, mdbModalFooter, mdbBtn, mdbContainer  },
   mounted() {
+    this.getRooms();
   },
   methods: {
-    handleDateClick() {
+    ...mapActions([
+      'getRooms'
+    ]),
+    handleDateClick(info) {
+      this.startDatetime = this.endDatetime = info.date.toISOString()
+
       this.modal = true
-      debugger
     }
   },
   data() {
     return {
       startDatetime: "",
       endDatetime: "",
-      modal: true,
+      modal: false,
       calendarPlugins: [ timelinePlugin, dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
       header: {
       left: 'prev,next today',
