@@ -71,22 +71,38 @@ import interactionPlugin from '@fullcalendar/interaction';
 
 import { mdbContainer, mdbBtn, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody, mdbModalFooter } from "mdbvue";
 
-import { mapActions } from 'vuex'
+import { mapActions, mapMutations } from 'vuex'
 
 export default {
   components: { FullCalendar, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody, mdbModalFooter, mdbBtn, mdbContainer  },
   mounted() {
-    this.getRooms();
   },
   methods: {
-    ...mapActions([
-      'getRooms'
-    ]),
+    ...mapActions('rooms', {
+      loadRooms: 'getRooms',
+    }),
+    ...mapActions('teachers', {
+      loadTeachers: 'getTeachers',
+    }),
+     ...mapActions('specialties', {
+      loadSpecialties: 'getSpecialties',
+    }),
+    ...mapMutations('common', {
+      setIsLoadingData: 'SET_ISLOADING'
+    }),
     handleDateClick(info) {
-      this.startDatetime = this.endDatetime = info.date.toISOString()
+      this.setIsLoadingData(true)
+      Promise.all([this.loadRooms(), this.loadSpecialties(), this.loadTeachers()]).then(() => {
+        this.startDatetime = this.endDatetime = info.date.toISOString()
 
-      this.modal = true
+        this.modal = true
+        this.setIsLoadingData(false)
+      })
+
     }
+  },
+  computed: {
+
   },
   data() {
     return {

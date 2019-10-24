@@ -2,6 +2,8 @@ import api from '../../core/api'
 import conf from '../../core/conf'
 
 export default {
+  strict: true,
+  namespaced: true,
   state: {
     teachers: []
   },
@@ -9,9 +11,14 @@ export default {
     teachers: state => state.teachers
   },
   actions: {
-    async getTeachers({commit}) {
-      await api.get(conf.server.apis.teachers).then(res => {
-        commit('SET_TEACHERS', res);
+    getTeachers({commit}) {
+      return new Promise((resolve, reject) => {
+        api.get(conf.server.apis.teachers).then(res => {
+          commit('SET_TEACHERS', res);
+          return resolve(res);
+        }, error => {
+          return reject(error)
+        });
       });
     }
   },

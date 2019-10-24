@@ -2,6 +2,8 @@ import api from '../../core/api'
 import conf from '../../core/conf'
 
 export default {
+  strict: true,
+  namespaced: true,
   state: {
     specialties: []
   },
@@ -9,10 +11,15 @@ export default {
     rooms: state => state.specialties
   },
   actions: {
-    async getSpecialties({commit}) {
-      await api.get(conf.server.apis.specialties).then(res => {
-        commit('SET_SPECIALTIES', res);
-      });
+    getSpecialties({commit}) {
+      return new Promise((resolve, reject) => {
+        api.get(conf.server.apis.specialties).then(res => {
+          commit('SET_SPECIALTIES', res);
+          return resolve(res);
+        }, error => {
+          return reject(error);
+        });
+      })
     }
   },
   mutations: {

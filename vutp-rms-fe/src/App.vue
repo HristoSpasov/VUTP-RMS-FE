@@ -3,15 +3,36 @@
     <div id="nav">
       <navbar></navbar> 
     </div>
+    <div class="vld-parent">
+        <loading :active.sync="isLoading" 
+        :can-cancel="false" 
+        :is-full-page="true"></loading>
+    </div>
     <router-view/>
   </div>
 </template>
 
 <script>
-import navbar from  '@/views/Navbar.vue'
+import navbar from  '@/views/Navbar.vue';
+
+import loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
+
+import { mapGetters } from 'vuex'
+
 export default {
   components:{
-    navbar
+    navbar,
+    loading
+  },
+  data() {
+    return {
+    }
+  },
+  computed: {
+    ...mapGetters('common', {
+      isLoading: 'isLoading'
+    })
   }
 }
 </script>
