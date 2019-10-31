@@ -17,7 +17,7 @@
 
     <div v-expand="isExpanded" class="options expand">
       <div
-        v-for="option in configOptions"
+        v-for="option in configOptions" v-bind:key="option.id"
         class="option"
         @click="setCurrentSelectedOption(option);"
       >
@@ -66,8 +66,7 @@ export default {
   directives: {
     expand: {
       inserted: function(el, binding) {
-        if (binding.value !== null) {
-          function calcHeight() {
+        function calcHeight() {
             const currentState = el.getAttribute("aria-expanded");
             el.classList.add("u-no-transition");
             el.removeAttribute("aria-expanded");
@@ -78,6 +77,7 @@ export default {
               el.classList.remove("u-no-transition");
             });
           }
+        if (binding.value !== null) {
           el.classList.add("expand");
           el.setAttribute("aria-expanded", binding.value ? "true" : "false");
           calcHeight();

@@ -2,10 +2,20 @@ export default {
   strict: true,
   namespaced: true,
   state: {
-    isLoading: false
+    isLoading: false,
+    dropdownConfig: {
+      options: [],
+      placeholder: "--Select--",
+      backgroundColor: "#cde4f5",
+      textColor: "black",
+      borderRadius: "1.5em",
+      border: "1px solid gray",
+      width: 300
+    },
   },
   getters: {
-    isLoading: state => state.isLoading
+    isLoading: state => state.isLoading,
+    dropdownConfig: state => state.dropdownConfig
   },
   actions: {
     

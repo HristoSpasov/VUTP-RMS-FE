@@ -51,7 +51,7 @@
             </datetime>
             <span>End time</span>
           </div>
-          <dropdown :config="dropDownConfig"></dropdown>
+          <dropdown :config="teachersDropdownConfig"></dropdown>
         </mdb-modal-body>
         <mdb-modal-footer class="justify-content-center">
         <mdb-btn @click="handleDateClick" color="info">Add</mdb-btn>
@@ -70,8 +70,8 @@ import listPlugin from '@fullcalendar/list';
 import timelinePlugin from '@fullcalendar/timeline';
 import interactionPlugin from '@fullcalendar/interaction';
 
-import dropdown from '../components/Dropdown/dropdown';
-
+import dropdown from '../components/dropdown/Dropdown';
+import _ from 'lodash';
 import { mdbContainer, mdbBtn, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody, mdbModalFooter } from "mdbvue";
 
 import { mapActions, mapMutations, mapGetters } from 'vuex'
@@ -85,7 +85,7 @@ export default {
       loadRooms: 'getRooms',
     }),
     ...mapActions('teachers', {
-      loadTeachers: 'getTeachers',
+      loadTeachers: 'getTeachers'
     }),
      ...mapActions('specialties', {
       loadSpecialties: 'getSpecialties',
@@ -98,18 +98,46 @@ export default {
       Promise.all([this.loadRooms(), this.loadSpecialties(), this.loadTeachers()]).then(() => {
         this.startDatetime = this.endDatetime = info.date.toISOString()
 
+        this.teachersDropdownConfig = this.getTeachersDropdownConfig(this.getTeachers)
         this.modal = true
         this.setIsLoadingData(false)
       })
+
+      
+    },
+    getTeachersDropdownConfig(teachers) {
+      let teachersDropdownConfig = _.cloneDeep(this.getDropDownConfig);
+      teachersDropdownConfig.placeholder = this.getTeachersDropdownPlaceholder;
+      teachers.forEach(teacher => {
+        let dropdownOption = { id: teacher.id, value: this.getTeacherInfo(teacher) };
+        teachersDropdownConfig.options.push(dropdownOption);
+      })
+
+      return teachersDropdownConfig;
+    },
+    getTeacherInfo(teacher)
+    {
+      return `${teacher.academicTitle} - ${teacher.firstName} ${teacher.lastName}`;
     }
   },
   computed: {
     ...mapGetters('teachers', {
-      getTeachers: 'teachers'
+      getTeachers: 'teachers',
+      getTeachersDropdownPlaceholder: 'dropdownPlaceholder'
+    }),
+    ...mapGetters('specialties', {
+      getSpecialties: 'specialties'
+    }),
+    ...mapGetters('rooms', {
+      getRooms: 'rooms'
+    }),
+    ...mapGetters('common', {
+      getDropDownConfig: 'dropdownConfig'
     })
   },
   data() {
     return {
+      teachersDropdownConfig: {}, 
       startDatetime: "",
       endDatetime: "",
       modal: false,

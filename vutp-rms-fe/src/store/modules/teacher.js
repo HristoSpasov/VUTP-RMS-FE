@@ -5,10 +5,12 @@ export default {
   strict: true,
   namespaced: true,
   state: {
-    teachers: []
+    teachers: [],
+    dropdownPlaceholder: '-- Select Teacher --'
   },
   getters: {
-    teachers: state => state.teachers
+    teachers: state => state.teachers,
+    dropdownPlaceholder: state => state.dropdownPlaceholder
   },
   actions: {
     getTeachers({commit}) {
