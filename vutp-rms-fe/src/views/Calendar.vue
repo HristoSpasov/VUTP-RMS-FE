@@ -51,6 +51,7 @@
             </datetime>
             <span>End time</span>
           </div>
+          <dropdown :config="dropDownConfig"></dropdown>
         </mdb-modal-body>
         <mdb-modal-footer class="justify-content-center">
         <mdb-btn @click="handleDateClick" color="info">Add</mdb-btn>
@@ -69,12 +70,14 @@ import listPlugin from '@fullcalendar/list';
 import timelinePlugin from '@fullcalendar/timeline';
 import interactionPlugin from '@fullcalendar/interaction';
 
+import dropdown from '../components/Dropdown/dropdown';
+
 import { mdbContainer, mdbBtn, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody, mdbModalFooter } from "mdbvue";
 
-import { mapActions, mapMutations } from 'vuex'
+import { mapActions, mapMutations, mapGetters } from 'vuex'
 
 export default {
-  components: { FullCalendar, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody, mdbModalFooter, mdbBtn, mdbContainer  },
+  components: { FullCalendar, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody, mdbModalFooter, mdbBtn, mdbContainer, dropdown  },
   mounted() {
   },
   methods: {
@@ -98,11 +101,12 @@ export default {
         this.modal = true
         this.setIsLoadingData(false)
       })
-
     }
   },
   computed: {
-
+    ...mapGetters('teachers', {
+      getTeachers: 'teachers'
+    })
   },
   data() {
     return {
