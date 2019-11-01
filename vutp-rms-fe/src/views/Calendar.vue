@@ -51,10 +51,10 @@
             </datetime>
             <span>End time</span>
           </div>
-          <dropdown :config="teachersDropdownConfig"></dropdown>
+          <dropdown @setSelectedOption="setSelectedTeacher" :config="teachersDropdownConfig"></dropdown>
         </mdb-modal-body>
         <mdb-modal-footer class="justify-content-center">
-        <mdb-btn @click="handleDateClick" color="info">Add</mdb-btn>
+        <mdb-btn color="info">Add</mdb-btn>
         </mdb-modal-footer>
       </mdb-modal>
     </mdb-container>
@@ -85,7 +85,11 @@ export default {
       loadRooms: 'getRooms',
     }),
     ...mapActions('teachers', {
-      loadTeachers: 'getTeachers'
+      loadTeachers: 'loadTeachers',
+      loadTeacherInfoById: 'loadTeacherInfoById'
+    }),
+    ...mapMutations('teachers', {
+      setSelectedTeacher: 'SET_SELECTED_TEACHER'
     }),
      ...mapActions('specialties', {
       loadSpecialties: 'getSpecialties',
@@ -98,32 +102,39 @@ export default {
       Promise.all([this.loadRooms(), this.loadSpecialties(), this.loadTeachers()]).then(() => {
         this.startDatetime = this.endDatetime = info.date.toISOString()
 
-        this.teachersDropdownConfig = this.getTeachersDropdownConfig(this.getTeachers)
-        this.modal = true
-        this.setIsLoadingData(false)
-      })
-
-      
+        this.loadTeachersDropdownOptions(this.getTeachers).then(teachersDropdownConfig => {
+          this.teachersDropdownConfig = teachersDropdownConfig;
+          this.modal = true;
+          this.setIsLoadingData(false);
+        }) 
+      }) 
     },
-    getTeachersDropdownConfig(teachers) {
-      let teachersDropdownConfig = _.cloneDeep(this.getDropDownConfig);
-      teachersDropdownConfig.placeholder = this.getTeachersDropdownPlaceholder;
-      teachers.forEach(teacher => {
-        let dropdownOption = { id: teacher.id, value: this.getTeacherInfo(teacher) };
-        teachersDropdownConfig.options.push(dropdownOption);
-      })
-
-      return teachersDropdownConfig;
+    setSelectedTeacher(selectedTeacher) {
+      debugger
+      this.setSelectedTeacher(selectedTeacher.id);
+      this.teachersDropdownConfig.placeholder = selectedTeacher.value
     },
-    getTeacherInfo(teacher)
-    {
-      return `${teacher.academicTitle} - ${teacher.firstName} ${teacher.lastName}`;
+    loadTeachersDropdownOptions(teachers) {
+      const self = this;
+      return new Promise((resolve) => {
+        let teachersDropdownConfig = _.cloneDeep(self.getDropDownConfig);
+        teachersDropdownConfig.placeholder = self.getTeachersDropdownPlaceholder;
+        teachers.forEach(teacher => {
+          this.loadTeacherInfoById(teacher.id).then(teacherInfo => {
+            let dropdownOption = { id: teacher.id, value: teacherInfo };
+            teachersDropdownConfig.options.push(dropdownOption);
+            resolve(teachersDropdownConfig)
+          })
+        })
+      })     
     }
   },
   computed: {
     ...mapGetters('teachers', {
-      getTeachers: 'teachers',
-      getTeachersDropdownPlaceholder: 'dropdownPlaceholder'
+      getTeachers: 'getTeachers',
+      getSelectedTeacher: 'getSelectedTeacher',
+      getTeachersDropdownPlaceholder: 'getDropdownPlaceholder',
+      getSelectedTeacherInfo: 'getSelectedTeacherInfo'
     }),
     ...mapGetters('specialties', {
       getSpecialties: 'specialties'

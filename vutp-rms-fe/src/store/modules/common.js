@@ -10,7 +10,7 @@ export default {
       textColor: "black",
       borderRadius: "1.5em",
       border: "1px solid gray",
-      width: 300
+      width: 320
     },
   },
   getters: {
