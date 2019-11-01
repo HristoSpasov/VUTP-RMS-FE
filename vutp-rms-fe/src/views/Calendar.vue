@@ -51,7 +51,7 @@
             </datetime>
             <span>End time</span>
           </div>
-          <dropdown @setSelectedOption="setSelectedTeacher" :config="teachersDropdownConfig"></dropdown>
+            <multiselect v-model="value" deselect-label="Can't remove this value" track-by="id" placeholder="Select teacher" :options="getTeachers" :searchable="true" :allow-empty="false" :custom-label="getTeacherCustomLabel" @select="updateSelectedTeacher"></multiselect>
         </mdb-modal-body>
         <mdb-modal-footer class="justify-content-center">
         <mdb-btn color="info">Add</mdb-btn>
@@ -62,7 +62,7 @@
 </template>
 
 <script>
-
+import Multiselect from 'vue-multiselect'
 import FullCalendar from '@fullcalendar/vue'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -70,14 +70,12 @@ import listPlugin from '@fullcalendar/list';
 import timelinePlugin from '@fullcalendar/timeline';
 import interactionPlugin from '@fullcalendar/interaction';
 
-import dropdown from '../components/dropdown/Dropdown';
-import _ from 'lodash';
 import { mdbContainer, mdbBtn, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody, mdbModalFooter } from "mdbvue";
 
 import { mapActions, mapMutations, mapGetters } from 'vuex'
 
 export default {
-  components: { FullCalendar, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody, mdbModalFooter, mdbBtn, mdbContainer, dropdown  },
+  components: { Multiselect, FullCalendar, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody, mdbModalFooter, mdbBtn, mdbContainer  },
   mounted() {
   },
   methods: {
@@ -86,7 +84,6 @@ export default {
     }),
     ...mapActions('teachers', {
       loadTeachers: 'loadTeachers',
-      loadTeacherInfoById: 'loadTeacherInfoById'
     }),
     ...mapMutations('teachers', {
       setSelectedTeacher: 'SET_SELECTED_TEACHER'
@@ -97,57 +94,44 @@ export default {
     ...mapMutations('common', {
       setIsLoadingData: 'SET_ISLOADING'
     }),
+    getTeacherCustomLabel({ firstName, lastName, academicTitle }){
+      return `${academicTitle} - ${firstName} ${lastName}`;
+    },
     handleDateClick(info) {
       this.setIsLoadingData(true)
       Promise.all([this.loadRooms(), this.loadSpecialties(), this.loadTeachers()]).then(() => {
         this.startDatetime = this.endDatetime = info.date.toISOString()
 
-        this.loadTeachersDropdownOptions(this.getTeachers).then(teachersDropdownConfig => {
-          this.teachersDropdownConfig = teachersDropdownConfig;
-          this.modal = true;
-          this.setIsLoadingData(false);
-        }) 
+        this.modal = true;
+        this.setIsLoadingData(false);
       }) 
     },
-    setSelectedTeacher(selectedTeacher) {
-      debugger
-      this.setSelectedTeacher(selectedTeacher.id);
-      this.teachersDropdownConfig.placeholder = selectedTeacher.value
-    },
-    loadTeachersDropdownOptions(teachers) {
-      const self = this;
-      return new Promise((resolve) => {
-        let teachersDropdownConfig = _.cloneDeep(self.getDropDownConfig);
-        teachersDropdownConfig.placeholder = self.getTeachersDropdownPlaceholder;
-        teachers.forEach(teacher => {
-          this.loadTeacherInfoById(teacher.id).then(teacherInfo => {
-            let dropdownOption = { id: teacher.id, value: teacherInfo };
-            teachersDropdownConfig.options.push(dropdownOption);
-            resolve(teachersDropdownConfig)
-          })
-        })
-      })     
+    updateSelectedTeacher(selectedTeacher) {
+      this.setSelectedTeacher(selectedTeacher);
     }
   },
   computed: {
     ...mapGetters('teachers', {
       getTeachers: 'getTeachers',
-      getSelectedTeacher: 'getSelectedTeacher',
-      getTeachersDropdownPlaceholder: 'getDropdownPlaceholder',
-      getSelectedTeacherInfo: 'getSelectedTeacherInfo'
+      getSelectedTeacher: 'getSelectedTeacher'
     }),
     ...mapGetters('specialties', {
       getSpecialties: 'specialties'
     }),
     ...mapGetters('rooms', {
       getRooms: 'rooms'
-    }),
-    ...mapGetters('common', {
-      getDropDownConfig: 'dropdownConfig'
     })
   },
   data() {
     return {
+      options: [
+        { name: 'Vue.js', language: 'JavaScript' },
+        { name: 'Rails', language: 'Ruby' },
+        { name: 'Sinatra', language: 'Ruby' },
+        { name: 'Laravel', language: 'PHP', $isDisabled: true },
+        { name: 'Phoenix', language: 'Elixir' }
+      ],
+      value: null,
       teachersDropdownConfig: {}, 
       startDatetime: "",
       endDatetime: "",
@@ -179,9 +163,8 @@ export default {
 }
 
 </script>
-
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style lang='scss'>
-
 @import '~@fullcalendar/core/main.css';
 @import '~@fullcalendar/daygrid/main.css';
 @import '~@fullcalendar/timegrid/main.css';
