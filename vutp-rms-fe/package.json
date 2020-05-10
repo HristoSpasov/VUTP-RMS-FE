@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service serve --https --port 44357",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
@@ -23,6 +23,7 @@
     "luxon": "^1.19.3",
     "mdbootstrap": "^4.8.10",
     "mdbvue": "^5.8.3",
+    "oidc-client": "^1.6.1",
     "sass-loader": "^8.0.0",
     "vue": "^2.6.10",
     "vue-datetime": "^1.0.0-beta.10",

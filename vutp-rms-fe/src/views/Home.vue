@@ -1,18 +1,83 @@
 <template>
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div class="home">
+      <p v-if="isLoggedIn">User: {{ username }}</p>
+      <button class="btn" @click="login" v-if="!isLoggedIn">Login</button>
+      <button class="btn" @click="logout" v-if="isLoggedIn">Logout</button>
+      <button class="btn" @click="getProtectedApiData" v-if="isLoggedIn">Get API data</button>
+    </div>
+
+    <div v-if="dataEventRecordsItems && dataEventRecordsItems.length">
+      <!-- <div v-for="dataEventRecordsItem of dataEventRecordsItems">
+        <p><em>Id:</em> {{dataEventRecordsItem.id}} <em>Details:</em> {{dataEventRecordsItem.name}}  - {{dataEventRecordsItem.description}} - {{dataEventRecordsItem.timestamp}}</p>
+      </div> -->
+      <br />
+    </div>
+
   </div>
 </template>
-
-<script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-
-export default {
-  name: 'home',
-  components: {
-    HelloWorld
+<script lang="js">
+  import AuthService from '../core/userManager';
+   
+  export default {
+    name: "Home",
+    title: "Home",
+    data: () => ({
+      auth: new AuthService(),
+      currentUser: '',
+      accessTokenExpired: false,
+      isLoggedIn: false,
+      dataEventRecordsItems: []
+    }),
+    components: {
+    },
+    props: {   
+    },
+    methods: {
+      username() {
+        return this.currentUser;
+      },
+      login() {
+        this.auth.renewToken();
+      },
+      logout() {
+        this.auth.logout();
+      }
+    },
+    mounted() {
+        this.auth.getSignedIn().then(
+        signIn => {
+          this.signedIn = signIn
+        },
+        err => {
+          console.log(err)
+        }
+      )    
+    }
   }
-}
 </script>
+<style>
+  .btn {
+    color: #42b983;
+    font-weight: bold;
+    background-color: #007bff;
+    border-color: #007bff;
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid #42b983;
+    padding: .375rem .75rem;
+    margin: 10px;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: .25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  }
+</style>
