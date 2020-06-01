@@ -8,10 +8,10 @@ export default {
     specialties: []
   },
   getters: {
-    rooms: state => state.specialties
+    getSpecialties: state => state.specialties
   },
   actions: {
-    getSpecialties({commit}) {
+    loadSpecialties({commit}) {
       return new Promise((resolve, reject) => {
         api.get(conf.server.apis.specialties).then(res => {
           commit('SET_SPECIALTIES', res);
@@ -20,6 +20,33 @@ export default {
           return reject(error);
         });
       })
+    },
+    createSpecialty(_, specialtyInfo) {
+      return new Promise((resolve, reject) => {
+        api.post(conf.server.apis.specialties + '/create', specialtyInfo).then(res => {
+          return resolve(res);
+        }, error => {
+          return reject(error)
+        });
+      });
+    },
+    updateSpecialty(_, specialtyInfo) {
+      return new Promise((resolve, reject) => {
+        api.put(conf.server.apis.specialties + '/update', specialtyInfo).then(res => {
+          return resolve(res);
+        }, error => {
+          return reject(error)
+        });
+      });
+    },
+    deleteSpecialty(_, specialtyId) {
+      return new Promise((resolve, reject) => {
+        api.remove(conf.server.apis.specialties + `/delete/` + specialtyId).then(res => {
+          return resolve(res);
+        }, error => {
+          return reject(error)
+        });
+      });
     }
   },
   mutations: {

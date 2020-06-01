@@ -1,83 +1,120 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
+    <img alt="UTP logo" src="../assets/logo.png" width="200">
     <div class="home">
-      <p v-if="isLoggedIn">User: {{ username }}</p>
-      <button class="btn" @click="login" v-if="!isLoggedIn">Login</button>
-      <button class="btn" @click="logout" v-if="isLoggedIn">Logout</button>
-      <button class="btn" @click="getProtectedApiData" v-if="isLoggedIn">Get API data</button>
+      <section class="section">
+        <h1 class="title">Select events to display</h1>
+        <div class="container has-text-centered">
+          <div v-if="getDisciplines.length > 0" class="column is-4 is-offset-4">
+            <multiselect  track-by="id" placeholder="Select discipline" :options=getDisciplines :searchable="true" :allow-empty="false" :custom-label="getDisciplineCustomLabel" @select="filterDisciplineEvents"></multiselect>
+          </div>
+          <div v-if="getRooms.length > 0" class="column is-4 is-offset-4">
+            <multiselect track-by="id" placeholder="Select room" :options=getRooms :searchable="true" :allow-empty="false" :custom-label="getRoomCustomLabel" @select="filterRoomEvents"></multiselect>
+          </div>
+          <div v-if="getTeachers.length > 0" class="column is-4 is-offset-4">
+            <multiselect track-by="id" placeholder="Select teacher" :options=getTeachers :searchable="true" :allow-empty="false" :custom-label="getTeacherCustomLabel" @select="filterTeacherEvent"></multiselect>
+          </div>
+          <div v-if="getSpecialties.length > 0" class="column is-4 is-offset-4">
+            <multiselect track-by="id" placeholder="Select specialty" :options=getSpecialties :searchable="true" :allow-empty="false" :custom-label="getSpecialtyCustomLabel" @select="filterSpecialtyEvents"></multiselect>
+          </div>
+        </div>  
+      </section> 
     </div>
-
-    <div v-if="dataEventRecordsItems && dataEventRecordsItems.length">
-      <!-- <div v-for="dataEventRecordsItem of dataEventRecordsItems">
-        <p><em>Id:</em> {{dataEventRecordsItem.id}} <em>Details:</em> {{dataEventRecordsItem.name}}  - {{dataEventRecordsItem.description}} - {{dataEventRecordsItem.timestamp}}</p>
-      </div> -->
-      <br />
-    </div>
-
   </div>
 </template>
 <script lang="js">
-  import AuthService from '../core/userManager';
-   
+  import { mapActions, mapMutations, mapGetters } from 'vuex'
+  import msg from '../core/msg';
+  import core from '../core/core'
+  
   export default {
     name: "Home",
     title: "Home",
     data: () => ({
-      auth: new AuthService(),
-      currentUser: '',
-      accessTokenExpired: false,
-      isLoggedIn: false,
-      dataEventRecordsItems: []
     }),
     components: {
     },
     props: {   
     },
     methods: {
-      username() {
-        return this.currentUser;
+      ...mapActions('events', {
+        loadEvents: 'loadEvents'
+      }),
+      ...mapActions('teachers', {
+        loadTeachers: 'loadTeachers'
+      }),
+      ...mapActions('rooms', {
+        loadRooms: 'loadRooms'
+      }),
+      ...mapActions('disciplines', {
+        loadDisciplines: 'loadDisciplines'
+      }),
+      ...mapActions('specialties', {
+        loadSpecialties: 'loadSpecialties'
+      }),
+      ...mapMutations('common', {
+        setIsLoadingData: 'SET_ISLOADING'
+      }),
+      getEventCustomLabel({rooms, disciplines, teachers, specialties, startTime, endTime}) {
+        var roomsString = rooms.map(r => r.number).join('/');
+        var disciplinesString = disciplines.map(d => d.name).join('/');
+        var teachersString = teachers.map(t => t.academicTitle + " " + t.firstName + " " + t.lastName).join('/');
+        var specialtiesString = specialties.map(s => s.name + "-" + s.grade);
+        return `R: ${roomsString}; D: ${disciplinesString}; T: ${teachersString}; S: ${specialtiesString}; ST: ${new Date(startTime).toLocaleString('bg')}; ET: ${new Date(endTime).toLocaleString('bg')};`
       },
-      login() {
-        this.auth.renewToken();
+      getRoomCustomLabel({ number }){
+        return `Room - ${number}`;
       },
-      logout() {
-        this.auth.logout();
+      getTeacherCustomLabel({ firstName, lastName, academicTitle }){
+        return `${academicTitle} - ${firstName} ${lastName}`;
+      },
+      getDisciplineCustomLabel({ name }){
+        return `Discipline - ${name}`;
+      },
+      getSpecialtyCustomLabel({ name, grade }){
+        return `Specialty - Name: ${name}; Grade: ${grade}`;
+      },
+      filterSpecialtyEvents(selectedSpecialty) {
+        core.go('/calendar', { type: "specialty", id: selectedSpecialty.id });
+      },
+      filterTeacherEvent(selectedTeacher) {
+        core.go('/calendar', { type: "teacher", id: selectedTeacher.id });
+      },
+      filterRoomEvents(selectedRoom) {
+        core.go('/calendar', { type: "room", id: selectedRoom.id });
+      },
+      filterDisciplineEvents(selectedDiscipline) {
+        core.go('/calendar', { type: "discipline", id: selectedDiscipline.id });
       }
     },
     mounted() {
-        this.auth.getSignedIn().then(
-        signIn => {
-          this.signedIn = signIn
-        },
-        err => {
-          console.log(err)
-        }
-      )    
+      this.setIsLoadingData(true)
+      Promise.all([this.loadRooms(), this.loadSpecialties(), this.loadTeachers(), this.loadDisciplines(), this.loadEvents()]).then(() => {
+        this.setIsLoadingData(false);
+      }).catch(() => {
+        msg.error('Loading data failed.');
+        this.setIsLoadingData(false);
+      })
+    },
+    computed: {
+      ...mapGetters('teachers', {
+          getTeachers: 'getTeachers',
+      }),
+      ...mapGetters('rooms', {
+          getRooms: 'getRooms',
+      }),
+      ...mapGetters('disciplines', {
+          getDisciplines: 'getDisciplines',
+      }),
+      ...mapGetters('specialties', {
+          getSpecialties: 'getSpecialties',
+      }),
+      ...mapGetters('events', {
+          getEvents: 'getEvents',
+      })
     }
   }
 </script>
 <style>
-  .btn {
-    color: #42b983;
-    font-weight: bold;
-    background-color: #007bff;
-    border-color: #007bff;
-    display: inline-block;
-    font-weight: 400;
-    text-align: center;
-    vertical-align: middle;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    background-color: transparent;
-    border: 1px solid #42b983;
-    padding: .375rem .75rem;
-    margin: 10px;
-    font-size: 1rem;
-    line-height: 1.5;
-    border-radius: .25rem;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-  }
+  
 </style>

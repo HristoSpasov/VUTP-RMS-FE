@@ -4,58 +4,87 @@
       defaultView="dayGridMonth" 
       :plugins="calendarPlugins"
       :header="header"
-      :editable="true"
+      :editable="false"
       slotDuration="00:15:00"
       :eventOverlap="false"
       :events="events"
-      @dateClick="handleDateClick" />
+      @eventClick="handleEventClick" />
 
     <mdb-container>
       <mdb-modal v-if="modal" @close="modal = false">
         <mdb-modal-header>
-          <mdb-modal-title tag="h4" class="w-100 text-center font-weight-bold">Add new event</mdb-modal-title>
+          <mdb-modal-title tag="h4" class="w-100 text-center font-weight-bold">Event information</mdb-modal-title>
         </mdb-modal-header>
         <mdb-modal-body>
-          <div>
-            <datetime 
-              class="theme-orange"
-              type="time"
-              v-model="startDatetime"
-              input-class="date-time"
-              value-zone="UTC"
-              zone="local"
-              :format="{ year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }"
-              :phrases="{ok: 'Continue', cancel: 'Exit'}"
-              :hour-step="1"
-              :minute-step="15"
-              :week-start="1"
-              use24-hour
-              auto>
-            </datetime>
-            <span>Start time</span>
+          <section class="section">
+      <div class="container has-text-centered">
+        <div class="column is-12 is-offset-0">
+          <multiselect v-if="!selectedEvent" deselect-label="Can't remove this value" track-by="id" :show-labels="false" placeholder="Select event" :options="getEvents" :searchable="true" :allow-empty="false" :custom-label="getEventCustomLabel" @select="updateSelectedEvent"></multiselect>
+          <div v-if="selectedEvent" class="box">          
+            <form @submit.prevent="handleSubmit">  
+              <div class="field">
+                <datetime
+                  input-id="startTime"   
+                  class="theme-orange"
+                  type="datetime"
+                  v-model="selectedEvent.startTime"
+                  input-class="date-time"
+                  value-zone="UTC"
+                  zone="local"
+                  disabled="true"
+                  :format="{ year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit'}"
+                  :phrases="{ok: 'Continue', cancel: 'Exit'}"
+                  :hour-step="1"
+                  :minute-step="15"
+                  :week-start="1"
+                  use24-hour
+                  auto
+                  title="Start Time">
+                  <label for="startTime" slot="before">Start Time</label>
+                </datetime>
+              </div>
+              <div class="field">
+                <datetime
+                  disabled="true"
+                  input-id="endTime"   
+                  class="theme-orange"
+                  type="datetime"
+                  v-model="selectedEvent.endTime"
+                  input-class="date-time"
+                  value-zone="UTC"
+                  zone="local"
+                  :format="{ year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit'}"
+                  :phrases="{ok: 'Continue', cancel: 'Exit'}"
+                  :hour-step="1"
+                  :minute-step="15"
+                  :week-start="1"
+                  use24-hour
+                  auto
+                  title="End Time">
+                  <label for="endTime" slot="before">End Time</label>
+                </datetime>
+              </div>
+              <div class="field">
+                <multiselect :disabled="true" :multiple="true" v-model="selectedEvent.rooms" select-label="Select" deselect-label="Remove selection" track-by="id" placeholder="Select rooms" :options="[]" :custom-label="getRoomCustomLabel" :searchable="false" :allow-empty="false"></multiselect>
+              </div>
+              <div class="field">
+                <multiselect  :disabled="true" :multiple="true" v-model="selectedEvent.teachers" select-label="Select" deselect-label="Remove selection" track-by="id" placeholder="Select teachers" :options="[]" :custom-label="getTeacherCustomLabel" :searchable="false" :allow-empty="false"></multiselect>
+              </div>
+              <div class="field">
+                <multiselect :disabled="true" :multiple="true" v-model="selectedEvent.disciplines" select-label="Select" deselect-label="Remove selection" track-by="id" placeholder="Select disciplines" :options="[]" :custom-label="getDisciplineCustomLabel" :searchable="false" :allow-empty="false"></multiselect>
+              </div>
+              <div class="field">
+                <multiselect  :disabled="true" :multiple="true" v-model="selectedEvent.specialties" select-label="Select" deselect-label="Remove selection" track-by="id" placeholder="Select specialties" :options="[]" :custom-label="getSpecialtyCustomLabel" :searchable="false" :allow-empty="false"></multiselect>
+              </div>
+            </form>
           </div>
-          <div>
-            <datetime 
-              class="theme-orange"
-              type="time"
-              v-model="endDatetime"
-              input-class="date-time"
-              zone="local"
-              :format="{ year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }"
-              :phrases="{ok: 'Continue', cancel: 'Exit'}"
-              :hour-step="1"
-              :minute-step="15"
-              :week-start="1"
-              use24-hour
-              auto>
-            </datetime>
-            <span>End time</span>
-          </div>
-            <multiselect v-model="value" deselect-label="Can't remove this value" track-by="id" placeholder="Select teacher" :options="getTeachers" :searchable="true" :allow-empty="false" :custom-label="getTeacherCustomLabel" @select="updateSelectedTeacher"></multiselect>
+        </div>
+      </div>  
+  </section> 
         </mdb-modal-body>
-        <mdb-modal-footer class="justify-content-center">
+        <!-- <mdb-modal-footer class="justify-content-center">
         <mdb-btn color="info">Add</mdb-btn>
-        </mdb-modal-footer>
+        </mdb-modal-footer> -->
       </mdb-modal>
     </mdb-container>
   </div>
@@ -70,94 +99,119 @@ import listPlugin from '@fullcalendar/list';
 import timelinePlugin from '@fullcalendar/timeline';
 import interactionPlugin from '@fullcalendar/interaction';
 
-import { mdbContainer, mdbBtn, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody, mdbModalFooter } from "mdbvue";
-
+import { mdbContainer, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody } from "mdbvue"; // mdbBtn, mdbModalFooter
 import { mapActions, mapMutations, mapGetters } from 'vuex'
+import core from '../core/core'
+import msg from '../core/msg'
 
 export default {
-  components: { Multiselect, FullCalendar, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody, mdbModalFooter, mdbBtn, mdbContainer  },
-  mounted() {
+    name: "Calendar",
+    title: "Calendar",
+    props: {
+      type: {
+          type: String,
+          default: null
+      },
+      id: {
+          id: String,
+          default: null
+      }
   },
+  components: { Multiselect, FullCalendar, mdbModal, mdbModalHeader, mdbModalTitle, mdbModalBody, mdbContainer  }, //mdbBtn, mdbModalFooter
   methods: {
-    ...mapActions('rooms', {
-      loadRooms: 'getRooms',
-    }),
-    ...mapActions('teachers', {
-      loadTeachers: 'loadTeachers',
-    }),
-    ...mapMutations('teachers', {
-      setSelectedTeacher: 'SET_SELECTED_TEACHER'
-    }),
-     ...mapActions('specialties', {
-      loadSpecialties: 'getSpecialties',
+    ...mapActions('events', {
+      loadFilteredEvents: 'loadFilteredEvents'
     }),
     ...mapMutations('common', {
       setIsLoadingData: 'SET_ISLOADING'
     }),
-    getTeacherCustomLabel({ firstName, lastName, academicTitle }){
-      return `${academicTitle} - ${firstName} ${lastName}`;
-    },
-    handleDateClick(info) {
-      this.setIsLoadingData(true)
-      Promise.all([this.loadRooms(), this.loadSpecialties(), this.loadTeachers()]).then(() => {
-        this.startDatetime = this.endDatetime = info.date.toISOString()
+    handleEventClick(info) {
+      var eventId = info.event.id;
+      this.selectedEvent = this.getFilteredEventById(eventId);
 
+      if (!this.selectedEvent) {
+        msg.error("Selected event cannot be shown.");
+      } else {
         this.modal = true;
-        this.setIsLoadingData(false);
-      }) 
+      }
     },
-    updateSelectedTeacher(selectedTeacher) {
-      this.setSelectedTeacher(selectedTeacher);
+     getRoomCustomLabel({ number }){
+        return `Room - ${number}`;
+      },
+      getTeacherCustomLabel({ firstName, lastName, academicTitle }){
+        return `${academicTitle} - ${firstName} ${lastName}`;
+      },
+      getDisciplineCustomLabel({ name }){
+        return `Discipline - ${name}`;
+      },
+      getSpecialtyCustomLabel({ name, grade }){
+        return `Specialty - Name: ${name}; Grade: ${grade}`;
+      },
+  },
+  mounted() {
+    if (!this.type || !this.id) {
+      core.go('/');
     }
+
+    var self = this;
+    var filterParams = { type: this.type, id: this.id };
+    
+    this.setIsLoadingData(true);
+    this.loadFilteredEvents(filterParams).then((res) => {
+      this.setIsLoadingData(false);
+      if (res.length === 0) {
+        msg.warn("No events found.");
+        core.go('/');
+      }
+
+      self.events = res.map(e =>{
+        return {
+          id: e.id,
+          end: e.endTime,
+          start: e.startTime,
+          title: e.disciplines.map(d => d.name).join(' / '),
+          allDay: false
+        }
+      });
+    }).catch((err) => {
+      msg.error(err.response.data.error);
+      this.setIsLoadingData(false);
+    });
   },
   computed: {
-    ...mapGetters('teachers', {
-      getTeachers: 'getTeachers',
-      getSelectedTeacher: 'getSelectedTeacher'
+    ...mapGetters('events', {
+      getFilteredEventById: 'getFilteredEventById'
     }),
-    ...mapGetters('specialties', {
-      getSpecialties: 'specialties'
-    }),
-    ...mapGetters('rooms', {
-      getRooms: 'rooms'
-    })
   },
   data() {
     return {
-      options: [
-        { name: 'Vue.js', language: 'JavaScript' },
-        { name: 'Rails', language: 'Ruby' },
-        { name: 'Sinatra', language: 'Ruby' },
-        { name: 'Laravel', language: 'PHP', $isDisabled: true },
-        { name: 'Phoenix', language: 'Elixir' }
-      ],
+      selectedEvent: null,
       value: null,
-      teachersDropdownConfig: {}, 
       startDatetime: "",
       endDatetime: "",
       modal: false,
       calendarPlugins: [ timelinePlugin, dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
-      header: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'timelineWeek,dayGridMonth,timeGridWeek,timeGridDay,list'
-    },
-    events: [{
-    id:"32rsm3h04dsuoikk2r1arfc3m0_20170624T160000Z",
-    "title":"Car payment $330.00 28th",
-    "start":"2019-10-21T09:00:00-07:00",
-    "end":"2019-10-21T09:00:00-07:45",
-    "allDay":false,
-    backgroundColor:"#0092D0"
-  },{
-    id:"32rsm3h04dsuoikk2r1arfc3m0_20170624T160000a",
-    "title":"Bill payment $25.00 28th",
-    "start":"2019-10-21T09:00:00-03:00",
-    "end":"2019-10-21T09:00:00-04:45",
-    "allDay":false,
-    backgroundColor:"#0092D0"
-  }]
-
+        header: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'timelineWeek,dayGridMonth,timeGridWeek,timeGridDay,list'
+      },
+      // This are test events. Upon load they are replaced. Check 'mounted' hook
+      events: [{
+        id:"32rsm3h04dsuoikk2r1arfc3m0_20170624T160000Z",
+        "title":"Car payment $330.00 28th",
+        "start":"2020-05-29T09:00:00-07:00",
+        "end":"2020-05-29T09:00:00-07:45",
+        "allDay":false,
+        backgroundColor:"#0092D0"
+      },{
+        id:"32rsm3h04dsuoikk2r1arfc3m0_20170624T160000a",
+        "title":"Bill payment $25.00 28th",
+        "start":"2020-05-29T09:00:00-03:00",
+        "end":"2020-05-29T09:00:00-04:45",
+        "allDay":false,
+        backgroundColor:"#0092D0"
+      }]
     }
   }
 }

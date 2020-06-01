@@ -22,6 +22,33 @@ export default {
           return reject(error)
         });
       });
+    },
+    createTeacher(_, teacherInfo) {
+      return new Promise((resolve, reject) => {
+        api.post(conf.server.apis.teachers + '/create', teacherInfo).then(res => {
+          return resolve(res);
+        }, error => {
+          return reject(error)
+        });
+      });
+    },
+    updateTeacher(_, teacherInfo) {
+      return new Promise((resolve, reject) => {
+        api.put(conf.server.apis.teachers + '/update', teacherInfo).then(res => {
+          return resolve(res);
+        }, error => {
+          return reject(error)
+        });
+      });
+    },
+    deleteTeacher(_, teacherId) {
+      return new Promise((resolve, reject) => {
+        api.remove(conf.server.apis.teachers + `/delete/` + teacherId).then(res => {
+          return resolve(res);
+        }, error => {
+          return reject(error)
+        });
+      });
     }
   },
   mutations: {

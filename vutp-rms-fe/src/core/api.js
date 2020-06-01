@@ -6,7 +6,7 @@ class Api {
   constructor() {
     this.defaultHeaders = {
       Accept: 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/json'
     }
   }
 

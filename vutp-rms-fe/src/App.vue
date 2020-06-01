@@ -3,6 +3,9 @@
     <div id="nav">
       <navbar></navbar> 
     </div>
+    <notifications  group="success" width="50%" position="center" animation-type="velocity" />
+    <notifications  group="warn" width="50%" position="center"  animation-type="velocity" />
+    <notifications  group="error" width="50%" position="center" animation-type="velocity" />
     <div class="vld-parent">
         <loading :active.sync="isLoading" 
         :can-cancel="false" 
@@ -48,6 +51,5 @@ export default {
 #nav a.router-link-exact-active {
   color: whitesmoke;
 }
-
 
 </style>

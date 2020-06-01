@@ -5,6 +5,9 @@ export default {
         rooms: '/rooms',
         teachers: '/teachers',
         specialties: '/specialties',
+        accounts: '/accounts',
+        disciplines: '/disciplines',
+        events: '/events'
       }
     }
   }
