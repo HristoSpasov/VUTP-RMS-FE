@@ -61,7 +61,7 @@ export default {
   },
   mutations: {
     SET_AUTH_INFO(state, authInfo) {
-      state.authInfo = JSON.parse(authInfo);
+      state.authInfo = authInfo ? JSON.parse(authInfo) : null;
     }
   }
 }

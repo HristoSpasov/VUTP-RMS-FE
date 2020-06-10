@@ -37,7 +37,7 @@ const routes = [
     path: '/manage/:asset/:action?',
     name: 'manage',
     component: Manage,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, isAdmin: true },
     props: true
   },
   // {
@@ -67,14 +67,18 @@ router.beforeEach((to, from, next) => {
           query: { redirect: to.fullPath },
         });
       } else {
+        if (to.matched.some(record => record.meta.isAdmin)) {
+          if (store.getters['auth/isAdmin']) {
+            next();
+          } else {
+            core.go('/')
+          }
+        } else {
           next();
+        }  
       }
     } else {
-      if (store.getters['auth/isAuthenticated'] && (to.name === "register" || to.name === "login")) {
-        core.go('/')
-      } else {
-        next();
-      }
+      next();
     }
   } else {
     core.go('/')

@@ -89,10 +89,13 @@
     },
     mounted() {
       this.setIsLoadingData(true)
-      Promise.all([this.loadRooms(), this.loadSpecialties(), this.loadTeachers(), this.loadDisciplines(), this.loadEvents()]).then(() => {
+      Promise.all([this.loadRooms(), this.loadSpecialties(), this.loadTeachers(), this.loadDisciplines()]).then(() => {
         this.setIsLoadingData(false);
-      }).catch(() => {
-        msg.error('Loading data failed.');
+      }).catch((err) => {
+        if (err.response.status !== 401) {
+          msg.error('Loading data failed.');
+        }
+
         this.setIsLoadingData(false);
       })
     },
@@ -108,9 +111,6 @@
       }),
       ...mapGetters('specialties', {
           getSpecialties: 'getSpecialties',
-      }),
-      ...mapGetters('events', {
-          getEvents: 'getEvents',
       })
     }
   }

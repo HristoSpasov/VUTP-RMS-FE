@@ -137,8 +137,7 @@ import msg from '../../core/msg';
             this.register(this.user).then(() => {
                 self.setIsLoadingData(false);
                 core.go('login', {firstName: this.user.firstName, new: this.user.userName });
-            }).catch(err => {
-                console.log(err.response);
+            }).catch(() => {
                 self.setIsLoadingData(false);
             });
         },
