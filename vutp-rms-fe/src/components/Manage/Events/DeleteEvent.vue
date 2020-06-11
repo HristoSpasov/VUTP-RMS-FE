@@ -2,7 +2,7 @@
     <section class="section">
       <div class="container has-text-centered">
         <div class="column is-12 is-offset-0">
-          <multiselect v-if="!selectedEvent" deselect-label="Can't remove this value" track-by="id" :show-labels="false" placeholder="Select event" :options="getEvents" :searchable="true" :allow-empty="false" :custom-label="getEventCustomLabel" @select="updateSelectedEvent"></multiselect>
+          <multiselect selectLabel="" v-if="!selectedEvent" deselect-label="Can't remove this value" track-by="id" :show-labels="false" placeholder="Select event" :options="getEvents" :searchable="true" :allow-empty="false" :custom-label="getEventCustomLabel" @select="updateSelectedEvent"></multiselect>
           <div v-if="selectedEvent" class="box">          
             <form @submit.prevent="handleSubmit">  
               <div class="field">

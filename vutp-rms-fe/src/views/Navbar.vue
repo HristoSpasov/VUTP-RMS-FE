@@ -9,14 +9,14 @@
     </figure>
     
 
-    <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
+    <a class="navbar-burger" @click="showNav = !showNav" :class="{ 'is-active': showNav }">
+      <span></span>
+      <span></span>
+      <span></span>
     </a>
   </div>
 
-  <div id="navbarBasicExample" class="navbar-menu">
+  <div class="navbar-menu" :class="{ 'is-active': showNav }">
     <div class="navbar-start" v-if="isAuthenticated">
       <a @click="navigateManage('/')" class="navbar-item">Home</a>
       <div v-if="isAdmin" class="navbar-item has-dropdown is-hoverable">
@@ -61,7 +61,7 @@
     name: "Navbar",
     title: "Navbar",
     data: () => ({
-
+      showNav: false
     }),
     methods: {
       ...mapActions('auth', {

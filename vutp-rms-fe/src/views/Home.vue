@@ -6,16 +6,16 @@
         <h1 class="title">Select events to display</h1>
         <div class="container has-text-centered">
           <div v-if="getDisciplines.length > 0" class="column is-4 is-offset-4">
-            <multiselect  track-by="id" placeholder="Select discipline" :options=getDisciplines :searchable="true" :allow-empty="false" :custom-label="getDisciplineCustomLabel" @select="filterDisciplineEvents"></multiselect>
+            <multiselect selectLabel="" track-by="id" placeholder="Select discipline" :options=getDisciplines :searchable="true" :allow-empty="false" :custom-label="getDisciplineCustomLabel" @select="filterDisciplineEvents"></multiselect>
           </div>
           <div v-if="getRooms.length > 0" class="column is-4 is-offset-4">
-            <multiselect track-by="id" placeholder="Select room" :options=getRooms :searchable="true" :allow-empty="false" :custom-label="getRoomCustomLabel" @select="filterRoomEvents"></multiselect>
+            <multiselect selectLabel="" track-by="id" placeholder="Select room" :options=getRooms :searchable="true" :allow-empty="false" :custom-label="getRoomCustomLabel" @select="filterRoomEvents"></multiselect>
           </div>
           <div v-if="getTeachers.length > 0" class="column is-4 is-offset-4">
-            <multiselect track-by="id" placeholder="Select teacher" :options=getTeachers :searchable="true" :allow-empty="false" :custom-label="getTeacherCustomLabel" @select="filterTeacherEvent"></multiselect>
+            <multiselect selectLabel="" track-by="id" placeholder="Select teacher" :options=getTeachers :searchable="true" :allow-empty="false" :custom-label="getTeacherCustomLabel" @select="filterTeacherEvent"></multiselect>
           </div>
           <div v-if="getSpecialties.length > 0" class="column is-4 is-offset-4">
-            <multiselect track-by="id" placeholder="Select specialty" :options=getSpecialties :searchable="true" :allow-empty="false" :custom-label="getSpecialtyCustomLabel" @select="filterSpecialtyEvents"></multiselect>
+            <multiselect selectLabel="" track-by="id" placeholder="Select specialty" :options=getSpecialties :searchable="true" :allow-empty="false" :custom-label="getSpecialtyCustomLabel" @select="filterSpecialtyEvents"></multiselect>
           </div>
         </div>  
       </section> 

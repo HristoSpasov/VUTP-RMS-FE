@@ -2,7 +2,7 @@
     <section class="section">
       <div class="container has-text-centered">
         <div class="column is-4 is-offset-4">
-        <multiselect v-if="!selectedSpecialty" track-by="id" placeholder="Select specialty" :options=getSpecialties :searchable="true" :allow-empty="false" :custom-label="getSpecialtyCustomLabel" @select="updateselectedSpecialty"></multiselect>
+        <multiselect selectLabel="" v-if="!selectedSpecialty" track-by="id" placeholder="Select specialty" :options=getSpecialties :searchable="true" :allow-empty="false" :custom-label="getSpecialtyCustomLabel" @select="updateselectedSpecialty"></multiselect>
           <div v-if="selectedSpecialty" class="box">          
             <form @submit.prevent="handleSubmit">
               <div class="field">
